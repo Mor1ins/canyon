@@ -63,19 +63,30 @@ class Sensor {
   }
 
   read() {
-    var value = Math.random() * 100;
+    var value = Math.floor(Math.random() * 100);
     var dist = { NEAR: 0, MEDIUM: 0, FAR: 0, };
 
     if (this.steps.near.from < value && value < this.steps.near.to) {
       dist.NEAR = 1;
     }
 
-    if (this.steps.medium.from < value && value < this.steps.far.to) {
+    if (this.steps.medium.from < value && value < this.steps.medium.to) {
       dist.MEDIUM = 1;
     }
 
     if (this.steps.far.from < value && value < this.steps.far.to) {
       dist.FAR = 1;
+    }
+
+    if (dist.NEAR == 1 && dist.MEDIUM == 1) {
+      var diff = (value - this.steps.medium.from) / (this.steps.near.to - this.steps.medium.from);
+      dist.NEAR -= diff;
+      dist.MEDIUM = diff;
+    }
+    else if (dist.MEDIUM == 1 && dist.FAR == 1) {
+      var diff = (value - this.steps.far.from) / (this.steps.medium.to - this.steps.far.from);
+      dist.MEDIUM -= diff;
+      dist.FAR = diff;
     }
 
     return dist;
