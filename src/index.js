@@ -55,7 +55,32 @@ class Sensor {
     this.graphics.clear();
     this.graphics.strokeLineShape(this.line);
   }
+
+  read() {
+    var rand = Math.random();
+
+    var dist;
+    if (rand > 0.75) {
+      dist = FAR;
+    }
+    else if (rand > 0.5) {
+      dist = MEDIUM;
+    }
+    else if (rand > 0.25) {
+      dist = NEAR;
+    }
+    else {
+      dist = VERY_NEAR;
+    }
+
+    return dist;
+  }
 }
+
+const VERY_NEAR = 0;
+const NEAR = 1;
+const MEDIUM = 2;
+const FAR = 3;
 
 class Car {
   constructor(context, image) {
@@ -95,7 +120,20 @@ class Car {
     this.car.angle += 5;
   }
 
+
+  /// TODO: логика поворота
+  /// используй функцию сенсоров read
+  makeDecision() {
+    if (Math.random() > 0.5) {
+      this.turnLeft();
+    }
+    else {
+      this.turnRight();
+    }
+  }
+
   drive() {
+    this.makeDecision();
     let angle = getRadian(this.car.angle);
     let cos = Math.cos(angle);
     let sin = Math.sin(angle);
@@ -105,10 +143,6 @@ class Car {
     this.leftSensor.update(this.car.x, this.car.y, this.car.angle);
     this.frontSensor.update(this.car.x, this.car.y, this.car.angle);
     this.rightSensor.update(this.car.x, this.car.y, this.car.angle);
-  }
-
-  readSensors() {
-
   }
 }
 
@@ -134,16 +168,7 @@ function create() {
 }
 
 function update() {
-  if (!gameReady) return
-  makeDecision(car);
-  car.drive();
-}
+  if (!gameReady) return;
 
-function makeDecision(gameCar) {
-  if (Math.random() > 0.5) {
-    car.turnLeft();
-  }
-  else {
-    car.turnRight();
-  }
+  car.drive();
 }
