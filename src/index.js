@@ -15,12 +15,9 @@ const config = {
 const game = new Phaser.Game(config);
 
 function preload() {
-  this.load.image("logo", logoImg);
 }
 
 function create() {
-  const logo = this.add.image(400, 150, "logo");
-
   this.tweens.add({
     targets: logo,
     y: 450,
