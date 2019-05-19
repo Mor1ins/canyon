@@ -10,8 +10,8 @@ const enviroment = {
   game_width: 1050,
   game_height: 700,
   title: "canyon",
-  sensorLength: 50,
-  car_speed: 5,
+  sensorLength: 100,
+  car_speed: 2,
   sensor_angle: 30,
 };
 
@@ -37,6 +37,7 @@ var gameReady = false;
 
 class Sensor {
   constructor(x, y, context, length, angle, width, color, offset) {
+    this.length = length;
     this.graphics = context.add.graphics({ lineStyle: { width: width, color: color } });
     this.line = new Phaser.Geom.Line(x, y, x + length, y);
     var point = new Phaser.Geom.Point(x, y);
@@ -45,9 +46,9 @@ class Sensor {
   }
 
   update(x, y, angle) {
-    this.line.x1 = x;
+    this.line.x1 = x + 12;
     this.line.y1 = y;
-    this.line.x2 = this.line.x1 + 50;
+    this.line.x2 = this.line.x1 + this.length;
     this.line.y2 = this.line.y1;
     var point = new Phaser.Geom.Point(x, y);
     Phaser.Geom.Line.RotateAroundPoint(this.line, point, getRadian(angle - this.offset));
@@ -72,15 +73,18 @@ class Car {
     this.leftSensor = new Sensor(
       this.car.x, this.car.y, context,
       enviroment.sensorLength, this.car.angle,
-      4, 0x000000, enviroment.car_start_angle);
-    //
-    // this.frontSensor = new Phaser.Geom.Line(
-    //   this.car.x, this.car.y,
-    //   this.car.x, this.car.y);
-    //
-    // this.rightSensor = new Phaser.Geom.Line(
-    //   this.car.x, this.car.y,
-    //   this.car.x, this.car.y);
+      2, 0x000000, enviroment.car_start_angle + 30);
+
+
+    this.frontSensor = new Sensor(
+      this.car.x, this.car.y, context,
+      enviroment.sensorLength, this.car.angle,
+      2, 0x000000, enviroment.car_start_angle);
+
+    this.rightSensor = new Sensor(
+      this.car.x, this.car.y, context,
+      enviroment.sensorLength, this.car.angle,
+      2, 0x000000, enviroment.car_start_angle - 30);
   }
 
   turnLeft() {
@@ -99,6 +103,8 @@ class Car {
     this.car.x += sin * enviroment.car_speed;
     this.car.y -= cos * enviroment.car_speed;
     this.leftSensor.update(this.car.x, this.car.y, this.car.angle);
+    this.frontSensor.update(this.car.x, this.car.y, this.car.angle);
+    this.rightSensor.update(this.car.x, this.car.y, this.car.angle);
   }
 
   readSensors() {
