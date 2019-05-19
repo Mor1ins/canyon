@@ -36,11 +36,12 @@ var game = new Phaser.Game(config);
 var gameReady = false;
 
 class Sensor {
-  constructor(x, y, context, length, angle, width, color) {
+  constructor(x, y, context, length, angle, width, color, offset) {
     this.graphics = context.add.graphics({ lineStyle: { width: width, color: color } });
     this.line = new Phaser.Geom.Line(x, y, x + length, y);
     var point = new Phaser.Geom.Point(x, y);
-    Phaser.Geom.Line.RotateAroundPoint(this.line, point, getRadian(angle));
+    Phaser.Geom.Line.RotateAroundPoint(this.line, point, getRadian(angle - offset));
+    this.offset = offset;
   }
 
   update(x, y, angle) {
@@ -49,7 +50,7 @@ class Sensor {
     this.line.x2 = this.line.x1 + 50;
     this.line.y2 = this.line.y1;
     var point = new Phaser.Geom.Point(x, y);
-    Phaser.Geom.Line.RotateAroundPoint(this.line, point, getRadian(angle));
+    Phaser.Geom.Line.RotateAroundPoint(this.line, point, getRadian(angle - this.offset));
     this.graphics.clear();
     this.graphics.strokeLineShape(this.line);
   }
@@ -70,8 +71,8 @@ class Car {
 
     this.leftSensor = new Sensor(
       this.car.x, this.car.y, context,
-      enviroment.sensorLength, this.car.angle - 180,
-      4, 0x000000);
+      enviroment.sensorLength, this.car.angle,
+      4, 0x000000, enviroment.car_start_angle);
     //
     // this.frontSensor = new Phaser.Geom.Line(
     //   this.car.x, this.car.y,
