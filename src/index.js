@@ -43,6 +43,12 @@ class Sensor {
     var point = new Phaser.Geom.Point(x, y);
     Phaser.Geom.Line.RotateAroundPoint(this.line, point, getRadian(angle - offset));
     this.offset = offset;
+
+    this.steps = {
+      near: {from: 0, to: 50},
+      medium: {from: 40, to: 70},
+      far: {from: 60, to: 100},
+    };
   }
 
   update(x, y, angle) {
@@ -57,30 +63,24 @@ class Sensor {
   }
 
   read() {
-    var rand = Math.random();
+    var value = Math.random() * 100;
+    var dist = { NEAR: 0, MEDIUM: 0, FAR: 0, };
 
-    var dist;
-    if (rand > 0.75) {
-      dist = FAR;
+    if (this.steps.near.from < value && value < this.steps.near.to) {
+      dist.NEAR = 1;
     }
-    else if (rand > 0.5) {
-      dist = MEDIUM;
+
+    if (this.steps.medium.from < value && value < this.steps.far.to) {
+      dist.MEDIUM = 1;
     }
-    else if (rand > 0.25) {
-      dist = NEAR;
-    }
-    else {
-      dist = VERY_NEAR;
+
+    if (this.steps.far.from < value && value < this.steps.far.to) {
+      dist.FAR = 1;
     }
 
     return dist;
   }
 }
-
-const VERY_NEAR = 0;
-const NEAR = 1;
-const MEDIUM = 2;
-const FAR = 3;
 
 class Car {
   constructor(context, image) {
@@ -164,7 +164,7 @@ function create() {
 
   car = new Car(this, "car");
 
-  gameReady = true; // line: {x1, y1, x2, y2}
+  gameReady = true;
 }
 
 function update() {
