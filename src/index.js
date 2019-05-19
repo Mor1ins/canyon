@@ -6,10 +6,12 @@ import carImg from "./assets/car.png";
 const enviroment = {
   car_x: 20,
   car_y: 50,
+  car_start_angle: 90,
   game_width: 1050,
   game_height: 700,
   title: "canyon",
-  sensorLength: 50
+  sensorLength: 50,
+  car_speed: 5,
 };
 
 
@@ -27,6 +29,42 @@ const config = {
 
 const game = new Phaser.Game(config);
 
+class Car {
+  constructor(context, image) {
+    this.car = context.add.sprite(
+      enviroment.car_x,
+      enviroment.car_y,
+      image
+    );
+
+    this.car.displayWidth = this.car.displayWidth * 0.05;
+    this.car.displayHeight = this.car.displayHeight * 0.05;
+
+    this.car.angle = enviroment.car_start_angle;
+  }
+
+  turnLeft() {
+    this.car.angle -= 5;
+  }
+
+  turnRight() {
+    this.car.angle += 5;
+  }
+
+  drive() {
+    let angle = this.car.angle * Math.PI / 180.0;
+    let cos = Math.cos(angle);
+    let sin = Math.sin(angle);
+    // console.log("angle: ", this.car.angle, " ;x: ", gameCar.x, " ; y: ", gameCar.y, " ;cos: ", cos, " ; sin: ", sin)
+    this.car.x += sin * enviroment.car_speed;
+    this.car.y -= cos * enviroment.car_speed;
+  }
+
+  readSensors() {
+
+  }
+}
+
 var car;
 
 function preload() {
@@ -41,43 +79,19 @@ function create() {
     "map"
   );
 
-  car = this.add.sprite(
-    enviroment.car_x,
-    enviroment.car_y,
-    "car"
-  );
-
-  car.displayWidth = car.displayWidth * 0.05;
-  car.displayHeight = car.displayHeight * 0.05;
-
-  car .angle += 90;
-  // this.tweens.add({
-  //   targets: logo,
-  //   y: 450,
-  //   duration: 2000,
-  //   ease: "Power2",
-  //   yoyo: true,
-  //   loop: -1
-  // });
+  car = new Car(this, "car");
 }
 
 function update() {
-  drive(car);
+  makeDecision(car);
+  car.drive(car);
 }
 
-function turnLeft() {
-  car.angle -= 5;
-}
-
-function turnRight() {
-  car.angle += 5;
-}
-
-function drive(gameCar) {
-  let angle = gameCar.angle * Math.PI / 180.0;
-  let cos = Math.cos(angle);
-  let sin = Math.sin(angle);
-  console.log("angle: ", gameCar.angle, " ;x: ", gameCar.x, " ; y: ", gameCar.y, " ;cos: ", cos, " ; sin: ", sin)
-  gameCar.x += sin;
-  gameCar.y += cos;
+function makeDecision(gameCar) {
+  if (Math.random() > 0.5) {
+    car.turnLeft();
+  }
+  else {
+    car.turnRight();
+  }
 }
