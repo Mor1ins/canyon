@@ -34,10 +34,6 @@ function getRadian(degrees) {
 var game;
 var gameReady = false;
 
-// defaults
-document.getElementById('inputCarX').value = enviroment.car_x;
-document.getElementById('inputCarY').value = enviroment.car_y;
-
 var example;
 var mapImg;
 
@@ -45,13 +41,13 @@ document.getElementById("start-btn").onclick = function() {
     console.log("START GAME");
     document.getElementById('game_menu').style.display = 'none';
 
-    var x = document.getElementById('inputCarX').value;
-    var y = document.getElementById('inputCarY').value;
     var sensor_length = document.getElementById('length-slider').value;
     var car_speed = document.getElementById('speed-slider').value;
     var mapa = document.getElementById('select-map').value;
 
     mapImg = './src/assets/' + mapa + '.jpg';
+
+
 
     example = document.getElementById("imageMap");
         example.style.display = 'none';
@@ -63,8 +59,26 @@ document.getElementById("start-btn").onclick = function() {
           ctx.drawImage(pic, 0, 0);
       }
 
-    enviroment.car_x = parseInt(x, 10);
-    enviroment.car_y = parseInt(y, 10);
+    if (mapa == 'Map 1') {
+        enviroment.car_x = 50
+        enviroment.car_y = 200
+    }
+
+    if (mapa == 'Map 2') {
+        enviroment.car_x = 50
+        enviroment.car_y = 250
+    }
+
+    if (mapa == 'Map 3') {
+        enviroment.car_x = 50
+        enviroment.car_y = 250
+    }
+
+    if (mapa == 'Map 4') {
+        enviroment.car_x = 50
+        enviroment.car_y = 450
+    }
+
     enviroment.sensorLength = parseInt(sensor_length, 10);
     enviroment.car_speed = parseInt(car_speed, 10);
 
