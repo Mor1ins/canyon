@@ -166,12 +166,7 @@ class Car {
         let front_sensor = this.frontSensor.read();
         let right_sensor = this.rightSensor.read();
         let left_sensor = this.leftSensor.read();
-        //let front_sensor = { NEAR: 1, MEDIUM: 0, FAR: 0 };
-        //let right_sensor = { NEAR: 0, MEDIUM: 1, FAR: 0 };
-        //let left_sensor = { NEAR: 0, MEDIUM: 0, FAR: 1 };
-        console.log("Front Sensor:" + front_sensor.FAR.toString() + " " + front_sensor.MEDIUM.toString() + " " + front_sensor.NEAR.toString());
-        console.log("Right Sensor:" + right_sensor.FAR.toString() + " " + right_sensor.MEDIUM.toString() + " " + right_sensor.NEAR.toString());
-        console.log("Left Sensor:" + left_sensor.FAR.toString() + " " + left_sensor.MEDIUM.toString() + " " + left_sensor.NEAR.toString());
+
         if (front_sensor.FAR > 0) {
             if (right_sensor.FAR > 0) {
                 if (left_sensor.FAR > 0) {
@@ -307,19 +302,10 @@ class Car {
                 }
             }
         }
-        /*angle_turn.WEAK_RIGHT = right_sensor.FAR * (left_sensor.MEDIUM + left_sensor.NEAR) * front_sensor.MEDIUM;
-        angle_turn.MEDIUM_RIGHT = right_sensor.MEDIUM * (left_sensor.NEAR + left_sensor.MEDIUM) * front_sensor.NEAR;
-        angle_turn.STRONG_RIGHT = right_sensor.FAR * (left_sensor.MEDIUM + left_sensor.NEAR) * front_sensor.NEAR;
-
-        angle_turn.WEAK_LEFT = left_sensor.FAR * (right_sensor.MEDIUM + right_sensor.NEAR + right_sensor.FAR) * front_sensor.MEDIUM;
-        angle_turn.MEDIUM_LEFT = left_sensor.MEDIUM * (right_sensor.NEAR + right_sensor.MEDIUM) * front_sensor.NEAR;
-        angle_turn.STRONG_LEFT = left_sensor.FAR * (right_sensor.MEDIUM + right_sensor.NEAR + right_sensor.FAR) * front_sensor.NEAR;*/
 
         this.car.angle += 3 * angle_turn.WEAK_RIGHT + 5 * angle_turn.MEDIUM_RIGHT + 10 * angle_turn.STRONG_RIGHT
             + (-3) * angle_turn.WEAK_LEFT + (-5) * angle_turn.MEDIUM_LEFT + -10 * angle_turn.STRONG_LEFT;
-         console.log("Angle Turn:" + angle_turn.WEAK_RIGHT.toString() + " " + angle_turn.MEDIUM_RIGHT.toString() + " " + angle_turn.STRONG_RIGHT.toString() + " " +
-         angle_turn.WEAK_LEFT.toString() + " " + angle_turn.MEDIUM_LEFT.toString() + " " + angle_turn.STRONG_LEFT.toString() + " Angle = " + this.car.angle );
-    }
+         }
 
     drive() {
         this.makeDecision();
