@@ -14,7 +14,7 @@ var enviroment = {
     game_height: 700,
     title: "canyon",
     sensorLength: 100,
-    car_speed: 3,
+    car_max_speed: 3,
     sensor_angle: 30,
 };
 
@@ -41,13 +41,14 @@ var gameReady = false;
 var example;
 var mapImg;
 
-document.getElementById("start-btn").onclick = function() {
+document.getElementById("start-btn").onclick = function () {
     console.log("START GAME");
     document.getElementById('game_menu').style.display = 'none';
 
     var sensor_length = document.getElementById('length-slider').value;
     var car_speed = document.getElementById('speed-slider').value;
     var mapa = document.getElementById('select-map').value;
+
 
     if (mapa == 'Map 1') {
       mapImg = mapImg1;
@@ -85,7 +86,7 @@ document.getElementById("start-btn").onclick = function() {
   }
 
     enviroment.sensorLength = parseInt(sensor_length, 10);
-    enviroment.car_speed = parseInt(car_speed, 10);
+    enviroment.car_max_speed = parseInt(car_speed, 10);
 
     game = new Phaser.Game(config);
 };
@@ -101,9 +102,15 @@ class Sensor {
         this.offset = offset;
 
         this.steps = {
-            near: {from: 0, to: 50},
-            medium: {from: 30, to: 80},
-            far: {from: 60, to: 100},
+            near: {from: 0, to: enviroment.sensorLength / 3 + (0.2 * enviroment.sensorLength)},
+            medium: {
+                from: enviroment.sensorLength / 3 - (0.2 * enviroment.sensorLength),
+                to: 2 * enviroment.car_max_speed / 3 + (0.2 * enviroment.sensorLength)
+            },
+            far: {
+                from: 2 * enviroment.sensorLength / 3 - (0.2 * enviroment.sensorLength),
+                to: enviroment.car_max_speed
+            },
         };
         this.c2d = document.getElementById('imageMap').getContext('2d');
     }
@@ -133,11 +140,11 @@ class Sensor {
     }
 
     read() {
-        var value = this.readRawData() * 100;
+        var value = this.readRawData() * this.length;
         //console.log("RawData = " + value);
         var dist = {NEAR: 0, MEDIUM: 0, FAR: 0};
 
-        if (this.steps.near.from < value && value <= this.steps.near.to) {
+        if (value <= this.steps.near.to) {
             dist.NEAR = 1;
         }
 
@@ -145,7 +152,7 @@ class Sensor {
             dist.MEDIUM = 1;
         }
 
-        if (this.steps.far.from < value && value <= this.steps.far.to) {
+        if (this.steps.far.from < value) {
             dist.FAR = 1;
         }
 
@@ -174,7 +181,7 @@ class Car {
         );
         this.car.displayWidth = this.car.displayWidth * 0.05;
         this.car.displayHeight = this.car.displayHeight * 0.05;
-
+        this.car.speed = enviroment.car_max_speed / 2;
         this.car.angle = enviroment.car_start_angle;
 
 
@@ -195,11 +202,6 @@ class Car {
             1, 0x000000, enviroment.car_start_angle - enviroment.sensor_angle);
     }
 
-    turnLeft() {
-        this.car.angle -= 5;
-    }
-
-
 
     cmp_sensors(sensor1, sensor2) {
         if (sensor1.NEAR != 0 || sensor2.NEAR != 0)
@@ -219,6 +221,22 @@ class Car {
             WEAK_RIGHT: 0,
             WEAK_LEFT: 0
         };
+        let speed = {
+            SLOW: 0,
+            MEDIUM: 0,
+            HIGH: 0
+        };
+        let steps = {
+            slow: {from: 0, to: enviroment.car_max_speed / 3 + (0.2 * enviroment.car_max_speed)},
+            medium: {
+                from: enviroment.car_max_speed / 3 - (0.2 * enviroment.car_max_speed),
+                to: 2 * enviroment.car_max_speed / 3 + (0.2 * enviroment.car_max_speed)
+            },
+            high: {
+                from: 2 * enviroment.car_max_speed / 3 - (0.2 * enviroment.car_max_speed),
+                to: enviroment.car_max_speed
+            },
+        };
         let front_sensor = this.frontSensor.read();
         let right_sensor = this.rightSensor.read();
         let left_sensor = this.leftSensor.read();
@@ -228,93 +246,109 @@ class Car {
         // console.log("Front Sensor:" + front_sensor.FAR.toString() + " " + front_sensor.MEDIUM.toString() + " " + front_sensor.NEAR.toString());
         // console.log("Right Sensor:" + right_sensor.FAR.toString() + " " + right_sensor.MEDIUM.toString() + " " + right_sensor.NEAR.toString());
         // console.log("Left Sensor:" + left_sensor.FAR.toString() + " " + left_sensor.MEDIUM.toString() + " " + left_sensor.NEAR.toString());
-        if (front_sensor.FAR > 0) {
-            if (right_sensor.FAR > 0) {
-                if (left_sensor.FAR > 0) {
-                    if (this.cmp_sensors(right_sensor, left_sensor))
-                        angle_turn.WEAK_LEFT += front_sensor.FAR * right_sensor.FAR * left_sensor.FAR;
-                    else
-                        angle_turn.WEAK_RIGHT += front_sensor.FAR * right_sensor.FAR * left_sensor.FAR;
-                }
-                if (left_sensor.MEDIUM > 0) {
-                    angle_turn.MEDIUM_RIGHT += front_sensor.FAR * right_sensor.FAR * left_sensor.MEDIUM;
-                }
-                if (left_sensor.NEAR > 0) {
-                    angle_turn.STRONG_RIGHT += front_sensor.FAR * right_sensor.FAR * left_sensor.NEAR;
-                }
+        if (right_sensor.FAR > 0) {
+            if (left_sensor.FAR > 0) {
+                if (this.cmp_sensors(right_sensor, left_sensor))
+                    angle_turn.WEAK_LEFT += front_sensor.FAR * right_sensor.FAR * left_sensor.FAR;
+                else
+                    angle_turn.WEAK_RIGHT += front_sensor.FAR * right_sensor.FAR * left_sensor.FAR;
+                speed.HIGH += front_sensor.FAR * right_sensor.FAR * left_sensor.FAR;
             }
-            if (right_sensor.MEDIUM > 0) {
-                if (left_sensor.FAR > 0) {
-                    angle_turn.MEDIUM_LEFT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.FAR;
-                }
-                if (left_sensor.MEDIUM > 0) {
-                    if (this.cmp_sensors(right_sensor, left_sensor))
-                        angle_turn.WEAK_LEFT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
-                    else
-                        angle_turn.WEAK_RIGHT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
-
-                }
-                if (left_sensor.NEAR > 0) {
-                    angle_turn.MEDIUM_RIGHT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.NEAR;
-                }
+            if (left_sensor.MEDIUM > 0) {
+                angle_turn.MEDIUM_RIGHT += front_sensor.FAR * right_sensor.FAR * left_sensor.MEDIUM;
+                speed.HIGH += front_sensor.FAR * right_sensor.FAR * left_sensor.MEDIUM;
             }
-            if (right_sensor.NEAR > 0) {
-                if (left_sensor.FAR > 0) {
-                    angle_turn.STRONG_LEFT += front_sensor.FAR * right_sensor.NEAR * left_sensor.FAR;
-                }
-                if (left_sensor.MEDIUM > 0) {
-                    angle_turn.MEDIUM_LEFT += front_sensor.FAR * right_sensor.NEAR * left_sensor.MEDIUM;
-                }
-                if (left_sensor.NEAR > 0) {
-                    if (this.cmp_sensors(right_sensor, left_sensor))
-                        angle_turn.WEAK_LEFT += front_sensor.FAR * right_sensor.NEAR * left_sensor.NEAR;
-                    else
-                        angle_turn.WEAK_RIGHT += front_sensor.FAR * right_sensor.NEAR * left_sensor.NEAR;
+            if (left_sensor.NEAR > 0) {
+                angle_turn.STRONG_RIGHT += front_sensor.FAR * right_sensor.FAR * left_sensor.NEAR;
+                speed.HIGH += front_sensor.FAR * right_sensor.FAR * left_sensor.NEAR;
+            }
+        }
+        if (right_sensor.MEDIUM > 0) {
+            if (left_sensor.FAR > 0) {
+                angle_turn.MEDIUM_LEFT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.FAR;
+                speed.HIGH += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.FAR;
+            }
+            if (left_sensor.MEDIUM > 0) {
+                if (this.cmp_sensors(right_sensor, left_sensor))
+                    angle_turn.MEDIUM_LEFT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
+                else
+                    angle_turn.MEDIUM_RIGHT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
+                speed.HIGH += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
 
-                }
+            }
+            if (left_sensor.NEAR > 0) {
+                angle_turn.STRONG_RIGHT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.NEAR;
+                speed.HIGH += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.NEAR;
+            }
+        }
+        if (right_sensor.NEAR > 0) {
+            if (left_sensor.FAR > 0) {
+                angle_turn.STRONG_LEFT += front_sensor.FAR * right_sensor.NEAR * left_sensor.FAR;
+                speed.HIGH += front_sensor.FAR * right_sensor.NEAR * left_sensor.FAR;
+            }
+            if (left_sensor.MEDIUM > 0) {
+                angle_turn.MEDIUM_LEFT += front_sensor.FAR * right_sensor.NEAR * left_sensor.MEDIUM;
+                speed.HIGH += front_sensor.FAR * right_sensor.NEAR * left_sensor.MEDIUM;
+            }
+            if (left_sensor.NEAR > 0) {
+                if (this.cmp_sensors(right_sensor, left_sensor))
+                    angle_turn.WEAK_LEFT += front_sensor.FAR * right_sensor.NEAR * left_sensor.NEAR;
+                else
+                    angle_turn.WEAK_RIGHT += front_sensor.FAR * right_sensor.NEAR * left_sensor.NEAR;
+                speed.HIGH += front_sensor.FAR * right_sensor.NEAR * left_sensor.NEAR;
+
             }
         }
         if (front_sensor.MEDIUM > 0) {
             if (right_sensor.FAR > 0) {
                 if (left_sensor.FAR > 0) {
                     if (this.cmp_sensors(right_sensor, left_sensor))
-                        angle_turn.MEDIUM_LEFT += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.FAR;
+                        angle_turn.STRONG_LEFT += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.FAR;
                     else
-                        angle_turn.MEDIUM_RIGHT += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.FAR;
+                        angle_turn.STRONG_RIGHT += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.FAR;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
                     angle_turn.MEDIUM_RIGHT += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.MEDIUM;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
                     angle_turn.STRONG_RIGHT += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.NEAR;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.NEAR;
                 }
             }
             if (right_sensor.MEDIUM > 0) {
                 if (left_sensor.FAR > 0) {
                     angle_turn.MEDIUM_LEFT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.FAR;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
                     if (this.cmp_sensors(right_sensor, left_sensor))
-                        angle_turn.WEAK_LEFT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.MEDIUM;
+                        angle_turn.MEDIUM_LEFT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.MEDIUM;
                     else
-                        angle_turn.WEAK_RIGHT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.MEDIUM;
+                        angle_turn.MEDIUM_RIGHT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.MEDIUM;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
-                    angle_turn.MEDIUM_RIGHT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.NEAR;
+                    angle_turn.STRONG_RIGHT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.NEAR;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.NEAR;
                 }
             }
             if (right_sensor.NEAR > 0) {
                 if (left_sensor.FAR > 0) {
                     angle_turn.STRONG_LEFT += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.FAR;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
-                    angle_turn.MEDIUM_LEFT += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.MEDIUM;
+                    angle_turn.STRONG_LEFT += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.MEDIUM;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
                     if (this.cmp_sensors(right_sensor, left_sensor))
                         angle_turn.WEAK_LEFT += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.NEAR;
                     else
                         angle_turn.WEAK_RIGHT += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.NEAR;
+                    speed.MEDIUM += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.NEAR;
                 }
             }
         }
@@ -325,56 +359,58 @@ class Car {
                         angle_turn.STRONG_LEFT += front_sensor.NEAR * right_sensor.FAR * left_sensor.FAR;
                     else
                         angle_turn.STRONG_RIGHT += front_sensor.NEAR * right_sensor.FAR * left_sensor.FAR;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.FAR * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
                     angle_turn.STRONG_RIGHT += front_sensor.NEAR * right_sensor.FAR * left_sensor.MEDIUM;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.FAR * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
                     angle_turn.STRONG_RIGHT += front_sensor.NEAR * right_sensor.FAR * left_sensor.NEAR;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.FAR * left_sensor.NEAR;
                 }
             }
             if (right_sensor.MEDIUM > 0) {
                 if (left_sensor.FAR > 0) {
                     angle_turn.STRONG_LEFT += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.FAR;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
                     if (this.cmp_sensors(right_sensor, left_sensor))
                         angle_turn.MEDIUM_LEFT += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
                     else
                         angle_turn.MEDIUM_RIGHT += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
-                    angle_turn.MEDIUM_RIGHT += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.NEAR;
+                    angle_turn.STRONG_RIGHT += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.NEAR;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.NEAR;
                 }
             }
             if (right_sensor.NEAR > 0) {
                 if (left_sensor.FAR > 0) {
                     angle_turn.STRONG_LEFT += front_sensor.NEAR * right_sensor.NEAR * left_sensor.FAR;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.NEAR * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
                     angle_turn.MEDIUM_LEFT += front_sensor.NEAR * right_sensor.NEAR * left_sensor.MEDIUM;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.NEAR * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
                     if (this.cmp_sensors(right_sensor, left_sensor))
                         angle_turn.WEAK_LEFT += front_sensor.NEAR * right_sensor.NEAR * left_sensor.NEAR;
                     else
                         angle_turn.WEAK_RIGHT += front_sensor.NEAR * right_sensor.NEAR * left_sensor.NEAR;
+                    speed.SLOW += front_sensor.NEAR * right_sensor.NEAR * left_sensor.NEAR;
 
                 }
             }
         }
-        /*angle_turn.WEAK_RIGHT = right_sensor.FAR * (left_sensor.MEDIUM + left_sensor.NEAR) * front_sensor.MEDIUM;
-        angle_turn.MEDIUM_RIGHT = right_sensor.MEDIUM * (left_sensor.NEAR + left_sensor.MEDIUM) * front_sensor.NEAR;
-        angle_turn.STRONG_RIGHT = right_sensor.FAR * (left_sensor.MEDIUM + left_sensor.NEAR) * front_sensor.NEAR;
 
-        angle_turn.WEAK_LEFT = left_sensor.FAR * (right_sensor.MEDIUM + right_sensor.NEAR + right_sensor.FAR) * front_sensor.MEDIUM;
-        angle_turn.MEDIUM_LEFT = left_sensor.MEDIUM * (right_sensor.NEAR + right_sensor.MEDIUM) * front_sensor.NEAR;
-        angle_turn.STRONG_LEFT = left_sensor.FAR * (right_sensor.MEDIUM + right_sensor.NEAR + right_sensor.FAR) * front_sensor.NEAR;*/
+        this.car.angle += 1 * angle_turn.WEAK_RIGHT + 3 * angle_turn.MEDIUM_RIGHT + 5 * angle_turn.STRONG_RIGHT
+            + (-1) * angle_turn.WEAK_LEFT + (-3) * angle_turn.MEDIUM_LEFT + -5 * angle_turn.STRONG_LEFT;
+        this.car.speed = speed.SLOW * (steps.slow.to + steps.slow.from) / 2 + speed.MEDIUM * (steps.medium.to + steps.medium.from) / 2 + speed.HIGH * (steps.high.to + steps.high.from) / 2
 
-        this.car.angle += 3 * angle_turn.WEAK_RIGHT + 5 * angle_turn.MEDIUM_RIGHT + 10 * angle_turn.STRONG_RIGHT
-            + (-3) * angle_turn.WEAK_LEFT + (-5) * angle_turn.MEDIUM_LEFT + -10 * angle_turn.STRONG_LEFT;
-         // console.log("Angle Turn:" + angle_turn.WEAK_RIGHT.toString() + " " + angle_turn.MEDIUM_RIGHT.toString() + " " + angle_turn.STRONG_RIGHT.toString() + " " +
-         // angle_turn.WEAK_LEFT.toString() + " " + angle_turn.MEDIUM_LEFT.toString() + " " + angle_turn.STRONG_LEFT.toString() + " Angle = " + this.car.angle );
     }
 
     drive() {
@@ -382,8 +418,8 @@ class Car {
         let angle = getRadian(this.car.angle);
         let cos = Math.cos(angle);
         let sin = Math.sin(angle);
-        this.car.x += sin * enviroment.car_speed;
-        this.car.y -= cos * enviroment.car_speed;
+        this.car.x += sin * this.car.speed;
+        this.car.y -= cos * this.car.speed;
         this.leftSensor.update(this.car.x, this.car.y, this.car.angle);
         this.frontSensor.update(this.car.x, this.car.y, this.car.angle);
         this.rightSensor.update(this.car.x, this.car.y, this.car.angle);
