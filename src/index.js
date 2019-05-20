@@ -125,7 +125,7 @@ class Car {
         this.leftSensor = new Sensor(
             this.car.x, this.car.y, context,
             enviroment.sensorLength, this.car.angle,
-            1, 0x000000, enviroment.car_start_angle + 30);
+            1, 0x000000, enviroment.car_start_angle + enviroment.sensor_angle);
 
 
         this.frontSensor = new Sensor(
@@ -136,7 +136,7 @@ class Car {
         this.rightSensor = new Sensor(
             this.car.x, this.car.y, context,
             enviroment.sensorLength, this.car.angle,
-            1, 0x000000, enviroment.car_start_angle - 30);
+            1, 0x000000, enviroment.car_start_angle - enviroment.sensor_angle);
     }
 
     turnLeft() {
