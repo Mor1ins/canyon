@@ -32,8 +32,15 @@ function getRadian(degrees) {
     return degrees * Math.PI / 180.0
 }
 
-var game = new Phaser.Game(config);
+var game;
 var gameReady = false;
+
+document.getElementById("start-btn").onclick = function() {
+    console.log("START GAME");
+    document.getElementById('game_menu').style.display = 'none';
+    game = new Phaser.Game(config);
+};
+
 
 class Sensor {
     constructor(x, y, context, length, angle, width, color, offset) {
