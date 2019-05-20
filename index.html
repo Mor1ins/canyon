@@ -4,5 +4,16 @@
     <meta charset="utf-8">
   </head>
   <body>
+    <canvas id='imageMap' width="1050" height="700" display="hidden">Обновите браузер</canvas>
+    <script>
+      var example = document.getElementById("imageMap");
+      example.style.display = 'none';
+      var ctx = example.getContext('2d');
+      var pic = new Image();
+      pic.src = './map1.jpg';
+      pic.onload = function() {
+        ctx.drawImage(pic, 0, 0);
+      }
+    </script>
   </body>
 </html>

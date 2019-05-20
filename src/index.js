@@ -49,6 +49,7 @@ class Sensor {
       medium: {from: 40, to: 70},
       far: {from: 60, to: 100},
     };
+    this.c2d = document.getElementById('imageMap').getContext('2d');
   }
 
   update(x, y, angle) {
@@ -62,8 +63,21 @@ class Sensor {
     this.graphics.strokeLineShape(this.line);
   }
 
+  readRawData() {
+    var points = this.line.getPoints(this.length);
+
+    for (let i = 0; i < points.length; i += 1) {
+      var pixel = this.c2d.getImageData(points[i].x, points[i].y, 1, 1).data;
+
+      if (pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0) {
+        return i / this.length;
+      }
+    }
+    return 1;
+  }
+
   read() {
-    var value = Math.floor(Math.random() * 100);
+    var value = this.readRawData() * 100;
     var dist = { NEAR: 0, MEDIUM: 0, FAR: 0, };
 
     if (this.steps.near.from < value && value < this.steps.near.to) {
@@ -92,6 +106,7 @@ class Sensor {
     return dist;
   }
 }
+var logs = {};
 
 class Car {
   constructor(context, image) {
@@ -109,18 +124,18 @@ class Car {
     this.leftSensor = new Sensor(
       this.car.x, this.car.y, context,
       enviroment.sensorLength, this.car.angle,
-      2, 0x000000, enviroment.car_start_angle + 30);
+      1, 0x000000, enviroment.car_start_angle + 30);
 
 
     this.frontSensor = new Sensor(
       this.car.x, this.car.y, context,
       enviroment.sensorLength, this.car.angle,
-      2, 0x000000, enviroment.car_start_angle);
+      1, 0x000000, enviroment.car_start_angle);
 
     this.rightSensor = new Sensor(
       this.car.x, this.car.y, context,
       enviroment.sensorLength, this.car.angle,
-      2, 0x000000, enviroment.car_start_angle - 30);
+      1, 0x000000, enviroment.car_start_angle - 30);
   }
 
   turnLeft() {
@@ -135,11 +150,11 @@ class Car {
   /// TODO: логика поворота
   /// используй функцию сенсоров read
   makeDecision() {
-    if (Math.random() > 0.5) {
-      this.turnLeft();
+    var value = this.frontSensor.read();
+    if (value.MEDIUM > 0.5) {
     }
     else {
-      this.turnRight();
+      this.turnLeft();
     }
   }
 
@@ -148,7 +163,6 @@ class Car {
     let angle = getRadian(this.car.angle);
     let cos = Math.cos(angle);
     let sin = Math.sin(angle);
-    // console.log("angle: ", this.car.angle, " ;x: ", gameCar.x, " ; y: ", gameCar.y, " ;cos: ", cos, " ; sin: ", sin)
     this.car.x += sin * enviroment.car_speed;
     this.car.y -= cos * enviroment.car_speed;
     this.leftSensor.update(this.car.x, this.car.y, this.car.angle);
@@ -160,7 +174,7 @@ class Car {
 var car;
 var graphics;
 var sensor;
-var angle_ddd = 20;
+
 function preload() {
   this.load.image("map", mapImg);
   this.load.image("car", carImg);
@@ -174,7 +188,7 @@ function create() {
   );
 
   car = new Car(this, "car");
-
+  
   gameReady = true;
 }
 
