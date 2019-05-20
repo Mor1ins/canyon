@@ -39,14 +39,28 @@ var gameReady = false;
 document.getElementById('inputCarX').value = enviroment.car_x;
 document.getElementById('inputCarY').value = enviroment.car_y;
 
+var example = document.getElementById("imageMap");
+        example.style.display = 'none';
+        var ctx = example.getContext('2d');
+        var pic = new Image();
+        pic.src = './map1.jpg';
+        pic.onload = function() {
+          ctx.drawImage(pic, 0, 0);
+      }
+
 document.getElementById("start-btn").onclick = function() {
     console.log("START GAME");
     document.getElementById('game_menu').style.display = 'none';
 
     var x = document.getElementById('inputCarX').value;
     var y = document.getElementById('inputCarY').value;
+    var sensor_length = document.getElementById('length-slider').value;
+    var car_speed = document.getElementById('speed-slider').value;
+
     enviroment.car_x = parseInt(x, 10);
     enviroment.car_y = parseInt(y, 10);
+    enviroment.sensorLength = parseInt(sensor_length, 10);
+    enviroment.car_speed = parseInt(car_speed, 10);
 
     game = new Phaser.Game(config);
 };
