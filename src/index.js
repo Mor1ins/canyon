@@ -106,7 +106,7 @@ class Sensor {
         for (let i = 0; i < points.length; i += 1) {
             var pixel = this.c2d.getImageData(points[i].x, points[i].y, 1, 1).data;
 
-            if (pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0) {
+            if (pixel[0] < 10 && pixel[1] < 10 && pixel[2] < 10) {
                 return i / this.length;
             }
         }
