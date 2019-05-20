@@ -3,7 +3,7 @@ import mapImg from "./assets/map1.jpg";
 import carImg from "./assets/car.png";
 // import enviroment from "./enviroment.js"
 
-const enviroment = {
+var enviroment = {
     car_x: 20,
     car_y: 50,
     car_start_angle: 90,
@@ -35,9 +35,19 @@ function getRadian(degrees) {
 var game;
 var gameReady = false;
 
+// defaults
+document.getElementById('inputCarX').value = enviroment.car_x;
+document.getElementById('inputCarY').value = enviroment.car_y;
+
 document.getElementById("start-btn").onclick = function() {
     console.log("START GAME");
     document.getElementById('game_menu').style.display = 'none';
+
+    var x = document.getElementById('inputCarX').value;
+    var y = document.getElementById('inputCarY').value;
+    enviroment.car_x = parseInt(x, 10);
+    enviroment.car_y = parseInt(y, 10);
+
     game = new Phaser.Game(config);
 };
 
@@ -325,7 +335,7 @@ class Car {
         this.car.angle += 3 * angle_turn.WEAK_RIGHT + 5 * angle_turn.MEDIUM_RIGHT + 10 * angle_turn.STRONG_RIGHT
             + (-3) * angle_turn.WEAK_LEFT + (-5) * angle_turn.MEDIUM_LEFT + -10 * angle_turn.STRONG_LEFT;
          // console.log("Angle Turn:" + angle_turn.WEAK_RIGHT.toString() + " " + angle_turn.MEDIUM_RIGHT.toString() + " " + angle_turn.STRONG_RIGHT.toString() + " " +
-         angle_turn.WEAK_LEFT.toString() + " " + angle_turn.MEDIUM_LEFT.toString() + " " + angle_turn.STRONG_LEFT.toString() + " Angle = " + this.car.angle );
+         // angle_turn.WEAK_LEFT.toString() + " " + angle_turn.MEDIUM_LEFT.toString() + " " + angle_turn.STRONG_LEFT.toString() + " Angle = " + this.car.angle );
     }
 
     drive() {
