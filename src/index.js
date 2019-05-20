@@ -117,7 +117,7 @@ class Sensor {
     }
 
     update(x, y, angle) {
-        this.line.x1 = x + 12;
+        this.line.x1 = x + 6;
         this.line.y1 = y;
         this.line.x2 = this.line.x1 + this.length;
         this.line.y2 = this.line.y1;
@@ -180,8 +180,8 @@ class Car {
             enviroment.car_y,
             image
         );
-        this.car.displayWidth = this.car.displayWidth * 0.05;
-        this.car.displayHeight = this.car.displayHeight * 0.05;
+        this.car.displayWidth = this.car.displayWidth * 0.025;
+        this.car.displayHeight = this.car.displayHeight * 0.025;
         this.car.speed = enviroment.car_max_speed / 2;
         this.car.angle = enviroment.car_start_angle;
 
