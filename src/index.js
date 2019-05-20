@@ -4,6 +4,7 @@ import mapImg1 from "./assets/Map 1.jpg";
 import mapImg2 from "./assets/Map 2.jpg";
 import mapImg3 from "./assets/Map 3.jpg";
 import mapImg4 from "./assets/Map 4.jpg";
+import finishImg from "./assets/finish_black.png";
 // import enviroment from "./enviroment.js"
 
 var enviroment = {
@@ -184,6 +185,7 @@ class Car {
         this.car.speed = enviroment.car_max_speed / 2;
         this.car.angle = enviroment.car_start_angle;
 
+        this.stopped = false;
 
         this.leftSensor = new Sensor(
             this.car.x, this.car.y, context,
@@ -414,12 +416,15 @@ class Car {
     }
 
     drive() {
+        if(this.stopped) return;
+
         this.makeDecision();
         let angle = getRadian(this.car.angle);
         let cos = Math.cos(angle);
         let sin = Math.sin(angle);
         this.car.x += sin * this.car.speed;
         this.car.y -= cos * this.car.speed;
+
         this.leftSensor.update(this.car.x, this.car.y, this.car.angle);
         this.frontSensor.update(this.car.x, this.car.y, this.car.angle);
         this.rightSensor.update(this.car.x, this.car.y, this.car.angle);
@@ -433,6 +438,7 @@ var sensor;
 function preload() {
     this.load.image("map", mapImg);
     this.load.image("car", carImg);
+    this.load.image("finish", finishImg);
 }
 
 function create() {
@@ -450,5 +456,28 @@ function create() {
 function update() {
     if (!gameReady) return;
 
+    if (car.car.x > (enviroment.game_width - 30)) {
+      console.log("FINISH GAME");
+      car.car.visible = false;
+      car.stopped = true;
+      gameReady = false;
+
+      this.add.rectangle(
+        enviroment.game_width / 2,
+        enviroment.game_height / 2,
+        enviroment.game_width,
+        enviroment.game_height,
+        0xffffff);
+
+      const finish = this.add.image(
+          enviroment.game_width / 2,
+          enviroment.game_height / 2,
+          "finish"
+      );
+
+      finish.displayHeight = enviroment.game_height;
+    }
+
     car.drive();
+
 }
