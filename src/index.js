@@ -1,5 +1,9 @@
 import Phaser from "phaser";
 import carImg from "./assets/car.png";
+import mapImg1 from "./assets/Map 1.jpg";
+import mapImg2 from "./assets/Map 2.jpg";
+import mapImg3 from "./assets/Map 3.jpg";
+import mapImg4 from "./assets/Map 4.jpg";
 // import enviroment from "./enviroment.js"
 
 var enviroment = {
@@ -45,39 +49,40 @@ document.getElementById("start-btn").onclick = function() {
     var car_speed = document.getElementById('speed-slider').value;
     var mapa = document.getElementById('select-map').value;
 
-    mapImg = './src/assets/' + mapa + '.jpg';
-
-
-
-    example = document.getElementById("imageMap");
-        example.style.display = 'none';
-        var ctx = example.getContext('2d');
-        var pic = new Image();
-        pic.src = './src/assets/' + mapa + '.jpg';
-        console.log(pic.src);
-        pic.onload = function() {
-          ctx.drawImage(pic, 0, 0);
-      }
-
     if (mapa == 'Map 1') {
-        enviroment.car_x = 50
-        enviroment.car_y = 200
+      mapImg = mapImg1;
+      enviroment.car_x = 50
+      enviroment.car_y = 200
     }
 
     if (mapa == 'Map 2') {
-        enviroment.car_x = 50
-        enviroment.car_y = 250
+      mapImg = mapImg2;
+      enviroment.car_x = 50
+      enviroment.car_y = 250
     }
 
     if (mapa == 'Map 3') {
-        enviroment.car_x = 50
-        enviroment.car_y = 250
+      mapImg = mapImg3;
+      enviroment.car_x = 50
+      enviroment.car_y = 250
     }
 
     if (mapa == 'Map 4') {
-        enviroment.car_x = 50
-        enviroment.car_y = 450
+      mapImg = mapImg4;
+      enviroment.car_x = 50
+      enviroment.car_y = 450
     }
+
+
+    example = document.getElementById("imageMap");
+    example.style.display = 'none';
+    var ctx = example.getContext('2d');
+    var pic = new Image();
+    pic.src = mapImg;
+    console.log(pic.src);
+    pic.onload = function() {
+      ctx.drawImage(pic, 0, 0);
+  }
 
     enviroment.sensorLength = parseInt(sensor_length, 10);
     enviroment.car_speed = parseInt(car_speed, 10);
