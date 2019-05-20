@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import mapImg from "./assets/map1.jpg";
 import carImg from "./assets/car.png";
 // import enviroment from "./enviroment.js"
 
@@ -39,14 +38,8 @@ var gameReady = false;
 document.getElementById('inputCarX').value = enviroment.car_x;
 document.getElementById('inputCarY').value = enviroment.car_y;
 
-var example = document.getElementById("imageMap");
-        example.style.display = 'none';
-        var ctx = example.getContext('2d');
-        var pic = new Image();
-        pic.src = './map1.jpg';
-        pic.onload = function() {
-          ctx.drawImage(pic, 0, 0);
-      }
+var example;
+var mapImg;
 
 document.getElementById("start-btn").onclick = function() {
     console.log("START GAME");
@@ -56,6 +49,19 @@ document.getElementById("start-btn").onclick = function() {
     var y = document.getElementById('inputCarY').value;
     var sensor_length = document.getElementById('length-slider').value;
     var car_speed = document.getElementById('speed-slider').value;
+    var mapa = document.getElementById('select-map').value;
+
+    mapImg = './src/assets/' + mapa + '.jpg';
+
+    example = document.getElementById("imageMap");
+        example.style.display = 'none';
+        var ctx = example.getContext('2d');
+        var pic = new Image();
+        pic.src = './src/assets/' + mapa + '.jpg';
+        console.log(pic.src);
+        pic.onload = function() {
+          ctx.drawImage(pic, 0, 0);
+      }
 
     enviroment.car_x = parseInt(x, 10);
     enviroment.car_y = parseInt(y, 10);
