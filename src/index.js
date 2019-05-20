@@ -176,9 +176,9 @@ class Car {
         //let front_sensor = { NEAR: 1, MEDIUM: 0, FAR: 0 };
         //let right_sensor = { NEAR: 0, MEDIUM: 1, FAR: 0 };
         //let left_sensor = { NEAR: 0, MEDIUM: 0, FAR: 1 };
-        console.log("Front Sensor:" + front_sensor.FAR.toString() + " " + front_sensor.MEDIUM.toString() + " " + front_sensor.NEAR.toString());
-        console.log("Right Sensor:" + right_sensor.FAR.toString() + " " + right_sensor.MEDIUM.toString() + " " + right_sensor.NEAR.toString());
-        console.log("Left Sensor:" + left_sensor.FAR.toString() + " " + left_sensor.MEDIUM.toString() + " " + left_sensor.NEAR.toString());
+        // console.log("Front Sensor:" + front_sensor.FAR.toString() + " " + front_sensor.MEDIUM.toString() + " " + front_sensor.NEAR.toString());
+        // console.log("Right Sensor:" + right_sensor.FAR.toString() + " " + right_sensor.MEDIUM.toString() + " " + right_sensor.NEAR.toString());
+        // console.log("Left Sensor:" + left_sensor.FAR.toString() + " " + left_sensor.MEDIUM.toString() + " " + left_sensor.NEAR.toString());
         if (front_sensor.FAR > 0) {
             if (right_sensor.FAR > 0) {
                 if (left_sensor.FAR > 0) {
