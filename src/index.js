@@ -324,7 +324,7 @@ class Car {
 
         this.car.angle += 3 * angle_turn.WEAK_RIGHT + 5 * angle_turn.MEDIUM_RIGHT + 10 * angle_turn.STRONG_RIGHT
             + (-3) * angle_turn.WEAK_LEFT + (-5) * angle_turn.MEDIUM_LEFT + -10 * angle_turn.STRONG_LEFT;
-         console.log("Angle Turn:" + angle_turn.WEAK_RIGHT.toString() + " " + angle_turn.MEDIUM_RIGHT.toString() + " " + angle_turn.STRONG_RIGHT.toString() + " " +
+         // console.log("Angle Turn:" + angle_turn.WEAK_RIGHT.toString() + " " + angle_turn.MEDIUM_RIGHT.toString() + " " + angle_turn.STRONG_RIGHT.toString() + " " +
          angle_turn.WEAK_LEFT.toString() + " " + angle_turn.MEDIUM_LEFT.toString() + " " + angle_turn.STRONG_LEFT.toString() + " Angle = " + this.car.angle );
     }
 
