@@ -262,7 +262,7 @@ class Car {
         if (front_sensor.FAR > 0) {
             if (right_sensor.FAR > 0) {
                 if (left_sensor.FAR > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.WEAK_LEFT += front_sensor.FAR * right_sensor.FAR * left_sensor.FAR;
                     else
                         angle_turn.WEAK_RIGHT += front_sensor.FAR * right_sensor.FAR * left_sensor.FAR;
@@ -283,7 +283,7 @@ class Car {
                     speed.HIGH += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.MEDIUM_LEFT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
                     else
                         angle_turn.MEDIUM_RIGHT += front_sensor.FAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
@@ -305,7 +305,7 @@ class Car {
                     speed.HIGH += front_sensor.FAR * right_sensor.NEAR * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.WEAK_LEFT += front_sensor.FAR * right_sensor.NEAR * left_sensor.NEAR;
                     else
                         angle_turn.WEAK_RIGHT += front_sensor.FAR * right_sensor.NEAR * left_sensor.NEAR;
@@ -317,7 +317,7 @@ class Car {
         if (front_sensor.MEDIUM > 0) {
             if (right_sensor.FAR > 0) {
                 if (left_sensor.FAR > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.STRONG_LEFT += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.FAR;
                     else
                         angle_turn.STRONG_RIGHT += front_sensor.MEDIUM * right_sensor.FAR * left_sensor.FAR;
@@ -338,7 +338,7 @@ class Car {
                     speed.MEDIUM += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.MEDIUM_LEFT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.MEDIUM;
                     else
                         angle_turn.MEDIUM_RIGHT += front_sensor.MEDIUM * right_sensor.MEDIUM * left_sensor.MEDIUM;
@@ -359,7 +359,7 @@ class Car {
                     speed.MEDIUM += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.MEDIUM_LEFT += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.NEAR;
                     else
                         angle_turn.MEDIUM_RIGHT += front_sensor.MEDIUM * right_sensor.NEAR * left_sensor.NEAR;
@@ -370,7 +370,7 @@ class Car {
         if (front_sensor.NEAR > 0) {
             if (right_sensor.FAR > 0) {
                 if (left_sensor.FAR > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.STRONG_LEFT += front_sensor.NEAR * right_sensor.FAR * left_sensor.FAR;
                     else
                         angle_turn.STRONG_RIGHT += front_sensor.NEAR * right_sensor.FAR * left_sensor.FAR;
@@ -391,7 +391,7 @@ class Car {
                     speed.SLOW += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.FAR;
                 }
                 if (left_sensor.MEDIUM > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.MEDIUM_LEFT += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
                     else
                         angle_turn.MEDIUM_RIGHT += front_sensor.NEAR * right_sensor.MEDIUM * left_sensor.MEDIUM;
@@ -412,7 +412,7 @@ class Car {
                     speed.SLOW += front_sensor.NEAR * right_sensor.NEAR * left_sensor.MEDIUM;
                 }
                 if (left_sensor.NEAR > 0) {
-                    if (right_value <= left_value)
+                    if (right_value < left_value)
                         angle_turn.STRONG_LEFT += front_sensor.NEAR * right_sensor.NEAR * left_sensor.NEAR;
                     else
                         angle_turn.STRONG_RIGHT += front_sensor.NEAR * right_sensor.NEAR * left_sensor.NEAR;
