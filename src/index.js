@@ -59,8 +59,8 @@ document.getElementById("start-btn").onclick = function () {
 
     if (mapa == 'Map 2') {
         mapImg = mapImg2;
-        enviroment.car_x = 50
-        enviroment.car_y = 250
+        enviroment.car_x = 20
+        enviroment.car_y = 50
     }
 
     if (mapa == 'Map 3') {
